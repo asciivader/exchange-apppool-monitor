@@ -1,1 +1,1 @@
-749955daca6c61542a84ab2074cae4727038a13955d6c47f7e86e4ac2c96c317  ExchangeAppPoolMonitor-Setup-1.0.0-standalone.exe
+179fa7243b037e7f1cc8540a5deeb620aa67bd50f642ac0bc976b1d0961c4ceb  ExchangeAppPoolMonitor-Setup-1.0.0-standalone.exe

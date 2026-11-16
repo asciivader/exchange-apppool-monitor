@@ -2,6 +2,12 @@
 
 Written by **Nathan Kelly**. Free software, distributed under the **[MIT License](LICENSE)**: free to use, copy, modify and share, including for commercial use. See [License](#license).
 
+## Download
+
+**[Download the installer: ExchangeAppPoolMonitor-Setup-1.0.0-standalone.exe](https://github.com/asciivader/exchange-apppool-monitor/raw/main/release/ExchangeAppPoolMonitor-Setup-1.0.0-standalone.exe)** (28 MB)
+
+The standalone installer includes everything it needs, .NET included, so it works on servers with no .NET installed and in air-gapped environments. Supported on Windows Server 2016 or later, 64-bit. Its SHA-256 checksum is in [`release/SHA256SUMS.txt`](release/SHA256SUMS.txt); check a download with `Get-FileHash <file>`. Installation steps: [Install](#install).
+
 ## Documentation
 
 | Document | Read it if you |
