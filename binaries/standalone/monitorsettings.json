@@ -1,0 +1,52 @@
+{
+  "Monitor": {
+    "PollIntervalSeconds": 10,
+    "QueueThreshold": 100,
+    "ConsecutiveSamplesBeforeRecycle": 2,
+    "RecycleCooldownMinutes": 10,
+    "AppPools": [
+      { "Name": "MSExchangeAutodiscoverAppPool", "EventMatches": [] },
+      { "Name": "MSExchangeDefaultAppPool", "EventMatches": [] }
+    ],
+    "LongRunningRequests": {
+      "Enabled": true,
+      "OlderThanSeconds": 30,
+      "Threshold": 50
+    },
+    "Event1309": {
+      "Enabled": true,
+      "CheckIntervalSeconds": 10,
+      "ErrorCount": 1,
+      "WindowMinutes": 10
+    },
+    "LogDirectory": "logs",
+    "LogRetentionDays": 90,
+    "StatusPageUrl": "http://localhost:8085",
+    "DryRun": false
+  },
+  "Email": {
+    "Enabled": true,
+    "SmtpServer": "localhost",
+    "Port": 25,
+    "EnableSsl": false,
+    "Username": "",
+    "Password": "",
+    "From": "apppool-monitor@example.com",
+    "To": [
+      "exchange-admins@example.com"
+    ],
+    "SubjectPrefix": "[AppPool Monitor]"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    },
+    "EventLog": {
+      "LogLevel": {
+        "Default": "Information",
+        "Microsoft": "Warning"
+      }
+    }
+  }
+}

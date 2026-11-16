@@ -1,0 +1,79 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <!-- .NET 6, because that is what is available at work. Pinned to C# 10, the language version
+         the .NET 6 SDK uses, so a newer SDK cannot accidentally let C# 11+ features in.
+         Plain net6.0 rather than net6.0-windows: the Windows-only parts are marked in
+         AssemblyInfo.cs instead, which keeps the Windows Desktop (WPF/WinForms) runtime packs,
+         which this app never uses, out of the build. -->
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>10.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>ExchangeAppPoolMonitor</RootNamespace>
+    <AssemblyName>ExchangeAppPoolMonitor</AssemblyName>
+    <!-- App version. Also used for the installer file name and the version shown in Apps. -->
+    <Version>1.0.0</Version>
+    <!-- Shown in the exe's file properties (Details tab). -->
+    <Product>Exchange AppPool Monitor</Product>
+    <Description>Recycles Exchange app pools early when requests back up or ASP.NET 1309 errors appear.</Description>
+    <Authors>Nathan Kelly</Authors>
+    <Company>Nathan Kelly</Company>
+    <Copyright>Copyright (c) 2026 Nathan Kelly. MIT License.</Copyright>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <!-- Edition to build: "Standalone" (default) or "DotNet6". Choose with -p:Flavor=DotNet6.
+         See the two property groups below and "Two editions" in the README. -->
+    <Flavor Condition="'$(Flavor)' == ''">Standalone</Flavor>
+    <!-- Keep build output, the installer sources, and the pre-built release files (binaries, packages,
+         release folders in the published repository) out of the app's own files. -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);artifacts/**;installer/**;publish/**;binaries/**;packages/**;release/**</DefaultItemExcludes>
+    <!-- No web.config: the app runs as a Windows service, not under IIS. -->
+    <IsTransformWebConfigDisabled>true</IsTransformWebConfigDisabled>
+    <!-- Record a neutral source path in the DLL and debug symbols instead of the folder the build
+         happened to run in, so the build machine's folder layout does not end up in the binaries. -->
+    <PathMap>$(MSBuildProjectDirectory)=C:\src\ExchangeAppPoolMonitor</PathMap>
+    <!-- Newer SDKs add source control details to every build when the project is in a git repo:
+         a link to the repository and commit in the debug symbols, and the commit hash in the
+         version. Turn that off so the binaries carry only the app's own version. -->
+    <EnableSourceLink>false</EnableSourceLink>
+    <EnableSourceControlManagerQueries>false</EnableSourceControlManagerQueries>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+  </PropertyGroup>
+
+  <!-- Standalone edition: for servers WITHOUT .NET. The .NET 6 and ASP.NET Core runtimes are bundled
+       into one single exe, so the published app is just ExchangeAppPoolMonitor.exe and
+       monitorsettings.json. Debug symbols are embedded in the exe instead of a separate .pdb. -->
+  <PropertyGroup Condition="'$(Flavor)' == 'Standalone'">
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <!-- Also pack the runtime's native DLLs into the exe. They are unpacked on first start, to the
+         folder in DOTNET_BUNDLE_EXTRACT_BASE_DIR (the installer sets this to the "runtime" subfolder). -->
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <!-- DotNet6 edition: for servers that already have the ASP.NET Core Runtime 6.0 (x64) installed.
+       Uses the installed runtime, so the published app is small: the exe, the app and about 15
+       library DLLs it uses that are not part of the runtime. -->
+  <PropertyGroup Condition="'$(Flavor)' == 'DotNet6'">
+    <SelfContained>false</SelfContained>
+  </PropertyGroup>
+
+  <Target Name="CheckFlavor" BeforeTargets="Restore;Build">
+    <Error Condition="'$(Flavor)' != 'Standalone' and '$(Flavor)' != 'DotNet6'"
+           Text="Unknown Flavor '$(Flavor)'. Use Standalone or DotNet6." />
+  </Target>
+
+  <!-- No NuGet packages. Everything the app uses is part of .NET 6 and ASP.NET Core 6 (the
+       shared frameworks the Web SDK references), or is called directly from Windows:
+         - Event log (reading 1309s, writing entries): System.Diagnostics.EventLog and
+           Microsoft.Extensions.Logging.EventLog, both part of ASP.NET Core 6.
+         - Performance counters: pdh.dll, called directly (RequestQueueReader.cs).
+         - Running as a Windows service: advapi32.dll, called directly (WindowsServiceLifetime.cs).
+       A NuGet-based version of the project is kept on the exchange-apppool-monitor-nuget branch. -->
+
+  <ItemGroup>
+    <Content Update="monitorsettings.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>
